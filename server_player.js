@@ -3,6 +3,7 @@ class ServerPlayer {
     this.id = id
     this.name = ""
     this.score = 0
+    this.hp = 100
     this.x = Math.random() * 600 + 100
     this.y = Math.random() * 400 + 100
     this.angle = 0
@@ -10,17 +11,21 @@ class ServerPlayer {
     this.thrust = 0
     this.fired = 0
     this.projectile = { ttl: 0, x: 0, y: 0, dx: 0, dy: 0 }
+    this.hit = 0
   }
 
   updatePosition(angle, thrust) {
-    this.angle = angle
-    this.thrust = thrust
+    if (this.hp > 0) {
+      this.angle = angle
+      this.thrust = thrust
+    }
     if (this.thrust > 0) {
       this.move.x += (Math.sin(this.angle) * this.thrust) / 1000
       this.move.y -= (Math.cos(this.angle) * this.thrust) / 1000
     }
     this.x += this.move.x
     this.y += this.move.y
+    if (this.hit > 0) this.hit--
   }
 
   stayInCanvas(width, height) {
@@ -31,7 +36,7 @@ class ServerPlayer {
   }
 
   updateProjectile(fired) {
-    if (fired == 1 && this.projectile.ttl == 0) {
+    if (fired == 1 && this.hp > 0 && this.projectile.ttl == 0) {
       this.projectile.ttl = 350
       this.projectile.x = this.x
       this.projectile.y = this.y
@@ -59,14 +64,16 @@ class ServerPlayer {
         continue
       }
       if (
-        Math.abs(this.projectile.x - enemy.x) < 25 &&
-        Math.abs(this.projectile.y - enemy.y) < 25
+        Math.abs(this.projectile.x - enemy.x) < 20 &&
+        Math.abs(this.projectile.y - enemy.y) < 20
       ) {
         this.score++
-        console.log("Score:", this.score)
         this.projectile.ttl = 0
         this.projectile.dx = 0
         this.projectile.dy = 0
+        enemy.hp -= 10
+        if (enemy.hp <= 0) enemy.hp = 0
+        enemy.hit = 40
       }
     }
   }
@@ -85,6 +92,7 @@ class ServerPlayer {
     return {
       id: this.id,
       name: this.name,
+      hp: this.hp,
       score: this.score,
       x: this.x,
       y: this.y,
@@ -93,8 +101,9 @@ class ServerPlayer {
       thrust: this.thrust,
       fired: this.fired,
       projectile: this.projectile,
+      hit: this.hit,
     }
   }
 }
 
-module.exports = ServerPlayer
+export default ServerPlayer

@@ -1,17 +1,26 @@
 class ClientPlayer {
-  constructor() {
-    this.id = 0
-    this.score = 0
-    this.x = 0
-    this.y = 0
-    this.angle = 0
-    this.move = { x: 0, y: 0 }
-    this.thrust = 0
-    this.fired = 0
-    this.projectile = { ttl: 0, x: 0, y: 0, dx: 0, dy: 0 }
+  constructor(p) {
+    this.update(p)
+  }
+  update(p) {
+    this.id = p.id
+    this.name = p.name
+    this.score = p.score
+    this.hp = p.hp
+    this.x = p.x
+    this.y = p.y
+    this.angle = p.angle
+    this.move = p.move
+    this.thrust = p.thrust
+    this.fired = p.fired
+    this.projectile = p.projectile
+    this.speed = Math.sqrt(
+      this.move.x * this.move.x + this.move.y * this.move.y
+    )
+    this.hit = p.hit
   }
 
-  draw(ctx, isLocalPlayer) {
+  drawPlayer(ctx, isLocalPlayer) {
     ctx.save()
     ctx.translate(this.x, this.y)
     if (isLocalPlayer) {
@@ -32,23 +41,54 @@ class ClientPlayer {
       ctx.fill()
     }
     // Vykreslení raketky
+
+    ctx.globalAlpha = 1
+
+    ctx.beginPath()
+    ctx.moveTo(0, -12 - this.hit)
+    ctx.lineTo(-6 - this.hit, 6 + this.hit)
+    ctx.lineTo(6 + this.hit, 6 + this.hit)
+    ctx.closePath()
+    ctx.fillStyle = isLocalPlayer ? "#fff" : "#d22"
+    ctx.fill()
+
+    ctx.rotate(-this.angle)
+
+    if (isLocalPlayer) {
+      this.drawPlayerInfo(ctx)
+    } else {
+      this.drawEnemyInfo(ctx)
+    }
+
+    ctx.restore()
+  }
+
+  drawDeadPlayer(ctx, isLocalPlayer) {
+    ctx.save()
+    ctx.translate(this.x, this.y)
+    ctx.rotate(this.angle)
     ctx.globalAlpha = 1
     ctx.beginPath()
     ctx.moveTo(0, -12)
     ctx.lineTo(-6, 6)
     ctx.lineTo(6, 6)
     ctx.closePath()
-    ctx.fillStyle = isLocalPlayer ? "white" : "red"
+    ctx.fillStyle = isLocalPlayer ? "#999" : "#a99"
     ctx.fill()
+
+    ctx.rotate(-this.angle)
+
+    if (isLocalPlayer) {
+      this.drawPlayerInfo(ctx)
+    } else {
+      this.drawEnemyInfo(ctx)
+    }
     ctx.restore()
   }
 
   drawCompass(ctx) {
-    const speed = Math.sqrt(
-      this.move.x * this.move.x + this.move.y * this.move.y
-    )
     let alpha = this.angle
-    if (speed > 0.001) {
+    if (this.speed > 0.001) {
       alpha = Math.atan2(this.move.y, this.move.x) + Math.PI / 2
     }
     ctx.rotate(alpha)
@@ -77,11 +117,21 @@ class ClientPlayer {
     ctx.closePath()
     ctx.fill()
     ctx.rotate(-alpha)
+  }
+
+  drawPlayerInfo(ctx) {
     ctx.globalAlpha = 0.8
     ctx.fillStyle = "#aaa"
     ctx.font = "10px Arial"
-    ctx.fillText("SPD: " + Math.round(speed * 1000), -20, 25)
+    ctx.fillText("SP: " + Math.round(this.speed * 1000), -15, 25)
+    ctx.fillText("HP: " + Math.round(this.hp), -15, 35)
     ctx.fillText(this.name + " " + this.score, -10, -20)
+  }
+  drawEnemyInfo(ctx) {
+    ctx.globalAlpha = 0.8
+    ctx.fillStyle = "#9aa"
+    ctx.font = "10px Arial"
+    ctx.fillText(this.name, -7, -20)
   }
 
   drawdirectionArrow(ctx) {
