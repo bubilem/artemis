@@ -23,6 +23,7 @@ io.on("connection", (socket) => {
       player.stayInCanvas(800, 800)
       player.updateProjectile(playerData.fired)
       player.stayProjectileInCanvas(800, 800)
+      player.checkPlayerHit(players)
       player.checkProjectileHit(players)
       playersJson[socket.id] = player.toJSON()
     }

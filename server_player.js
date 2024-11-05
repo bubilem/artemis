@@ -78,6 +78,26 @@ class ServerPlayer {
     }
   }
 
+  checkPlayerHit(players) {
+    for (let id in players) {
+      const enemy = players[id]
+      if (enemy.id == this.id) {
+        continue
+      }
+      if (Math.abs(this.x - enemy.x) < 20 && Math.abs(this.y - enemy.y) < 20) {
+        this.hit = 40
+        this.hp -= 10
+        if (this.hp <= 0) this.hp = 0
+        const move = this.move
+        this.move = enemy.move
+        enemy.move = move
+        enemy.hit = 40
+        enemy.hp -= 10
+        if (enemy.hp <= 0) enemy.hp = 0
+      }
+    }
+  }
+
   stayProjectileInCanvas(width, height) {
     if (this.projectile.ttl <= 0) {
       return
