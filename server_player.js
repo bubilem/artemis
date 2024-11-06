@@ -69,11 +69,13 @@ class ServerPlayer {
         Math.abs(this.projectile.x - enemy.x) < 20 &&
         Math.abs(this.projectile.y - enemy.y) < 20
       ) {
+        enemy.hp -= 10
+        enemy.move.x += this.projectile.dx / 20
+        enemy.move.y += this.projectile.dy / 20
         this.score++
         this.projectile.ttl = 0
         this.projectile.dx = 0
         this.projectile.dy = 0
-        enemy.hp -= 10
         if (enemy.hp <= 0) enemy.hp = 0
         enemy.hit = 40
       }
