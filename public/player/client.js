@@ -1,4 +1,5 @@
 import ClientPlayer from "./client_player.js"
+import ClientAsteroid from "./client_asteroid.js"
 const canvas = document.getElementById("gameCanvas")
 const ctx = canvas.getContext("2d")
 const socket = io()
@@ -24,6 +25,7 @@ function generateRandomName() {
 
 nameInput.value = generateRandomName()
 let players = {}
+let asteroids = {}
 let control = {
   name: nameInput.value,
   thrust: 0,
@@ -50,7 +52,19 @@ function updateControl() {
 }
 
 // Zpracování příchozího stavu hry
-socket.on("gameState", (serverPlayers) => {
+socket.on("gameState", (gameState) => {
+  //asteroids
+  const serverAsteroids = gameState.asteroids
+  for (const id in serverAsteroids) {
+    if (!asteroids[id]) {
+      asteroids[id] = new ClientAsteroid(serverAsteroids[id])
+    } else {
+      asteroids[id].update(serverAsteroids[id])
+    }
+  }
+
+  //players
+  const serverPlayers = gameState.players
   for (const id in players) {
     if (!serverPlayers[id]) {
       delete players[id]
@@ -75,6 +89,10 @@ socket.on("gameState", (serverPlayers) => {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height)
+  for (const id in asteroids) {
+    asteroids[id].draw(ctx)
+  }
+
   for (const id in players) {
     if (!players[id]) continue
     if (players[id].hp > 0) {

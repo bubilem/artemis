@@ -2,42 +2,57 @@ import express from "express"
 import { createServer } from "http"
 import { Server } from "socket.io"
 import ServerPlayer from "./server_player.js"
+import ServerAsteroid from "./server_asteroid.js"
 
 const app = express()
 const server = createServer(app)
 const io = new Server(server)
 app.use(express.static("public"))
 
-const players = {}
-const playersJson = {}
+const game = {
+  players: {},
+  asteroids: {},
+}
+game.asteroids[0] = new ServerAsteroid(60, 60, 20)
+game.asteroids[1] = new ServerAsteroid(740, 740, 40)
+
+const gameJson = {
+  players: {},
+  asteroids: {},
+}
 
 io.on("connection", (socket) => {
   console.log("New player connected:", socket.id)
-  players[socket.id] = new ServerPlayer(socket.id)
+  game.players[socket.id] = new ServerPlayer(socket.id)
 
   socket.on("updateControl", (playerData) => {
-    const player = players[socket.id]
+    const player = game.players[socket.id]
     if (player) {
       player.name = playerData.name
       player.updatePosition(playerData.angle, playerData.thrust)
       player.stayInCanvas(800, 800)
       player.updateProjectile(playerData.fired)
       player.stayProjectileInCanvas(800, 800)
-      player.checkPlayerHit(players)
-      player.checkProjectileHit(players)
-      playersJson[socket.id] = player.toJSON()
+      player.checkPlayerHit(game.players)
+      player.checkProjectileHit(game.players)
     }
   })
 
   socket.on("disconnect", () => {
     console.log("Player disconnected:", socket.id)
-    delete players[socket.id]
-    delete playersJson[socket.id]
+    delete game.players[socket.id]
+    delete gameJson.players[socket.id]
   })
 })
 
 setInterval(() => {
-  io.emit("gameState", playersJson)
+  for (const id in game.asteroids) {
+    gameJson.asteroids[id] = game.asteroids[id].toJSON()
+  }
+  for (const id in game.players) {
+    gameJson.players[id] = game.players[id].toJSON()
+  }
+  io.emit("gameState", gameJson)
 }, 1000 / 20)
 
 server.listen(3333, () => {
