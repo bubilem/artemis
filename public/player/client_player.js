@@ -73,7 +73,7 @@ class ClientPlayer {
     ctx.lineTo(-6, 6)
     ctx.lineTo(6, 6)
     ctx.closePath()
-    ctx.fillStyle = isLocalPlayer ? "#999" : "#a99"
+    ctx.fillStyle = "#888"
     ctx.fill()
 
     ctx.rotate(-this.angle)

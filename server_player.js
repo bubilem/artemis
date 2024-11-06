@@ -18,6 +18,8 @@ class ServerPlayer {
     if (this.hp > 0) {
       this.angle = angle
       this.thrust = thrust
+    } else {
+      this.thrust = 0
     }
     if (this.thrust > 0) {
       this.move.x += (Math.sin(this.angle) * this.thrust) / 1000
@@ -84,16 +86,18 @@ class ServerPlayer {
       if (enemy.id == this.id) {
         continue
       }
-      if (Math.abs(this.x - enemy.x) < 20 && Math.abs(this.y - enemy.y) < 20) {
+      if (Math.abs(this.x - enemy.x) < 16 && Math.abs(this.y - enemy.y) < 16) {
         this.hit = 40
+        enemy.hit = 40
+
         this.hp -= 10
         if (this.hp <= 0) this.hp = 0
+        enemy.hp -= 10
+        if (enemy.hp <= 0) enemy.hp = 0
+
         const move = this.move
         this.move = enemy.move
         enemy.move = move
-        enemy.hit = 40
-        enemy.hp -= 10
-        if (enemy.hp <= 0) enemy.hp = 0
       }
     }
   }

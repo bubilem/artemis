@@ -50,6 +50,10 @@ main {
       &:hover {
         background-color: #811;
       }
+      &.disabled {
+        background-color: #a77;
+        cursor: not-allowed;
+      }
     }
   }
 }

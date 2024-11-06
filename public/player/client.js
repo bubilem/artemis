@@ -4,7 +4,7 @@ const ctx = canvas.getContext("2d")
 const socket = io()
 
 const bgImage = new Image()
-bgImage.src = "bg.webp"
+bgImage.src = "../bg.webp"
 
 const nameInput = document.getElementById("nameInput")
 const thrustSlider = document.getElementById("thrustSlider")
@@ -45,8 +45,8 @@ fireButton.onclick = (e) => {
 }
 
 // Aktualizace hráče na server
-function updatePlayer() {
-  socket.emit("updatePlayer", control)
+function updateControl() {
+  socket.emit("updateControl", control)
 }
 
 // Zpracování příchozího stavu hry
@@ -62,6 +62,13 @@ socket.on("gameState", (serverPlayers) => {
     } else {
       players[id].update(serverPlayers[id])
     }
+  }
+  if (players[socket.id]?.projectile?.ttl == 0) {
+    fireButton.disabled = false
+    fireButton.classList.remove("disabled")
+  } else {
+    fireButton.disabled = true
+    fireButton.classList.add("disabled")
   }
 })
 
@@ -80,7 +87,7 @@ function draw() {
 }
 
 function gameLoop() {
-  updatePlayer()
+  updateControl()
   draw()
   requestAnimationFrame(gameLoop)
   control.fired = 0

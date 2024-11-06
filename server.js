@@ -15,7 +15,7 @@ io.on("connection", (socket) => {
   console.log("New player connected:", socket.id)
   players[socket.id] = new ServerPlayer(socket.id)
 
-  socket.on("updatePlayer", (playerData) => {
+  socket.on("updateControl", (playerData) => {
     const player = players[socket.id]
     if (player) {
       player.name = playerData.name
