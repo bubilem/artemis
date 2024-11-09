@@ -7,6 +7,7 @@ class ClientPlayer {
     this.name = p.name
     this.score = p.score
     this.hp = p.hp
+    this.shield = p.shield
     this.x = p.x
     this.y = p.y
     this.angle = p.angle
@@ -33,21 +34,22 @@ class ClientPlayer {
     // Vykreslení plamene
     if (this.thrust > 0) {
       ctx.beginPath()
-      ctx.moveTo(-4, 5)
-      ctx.lineTo(4, 5)
+      ctx.moveTo(-4, 7)
+      ctx.lineTo(4, 7)
       ctx.lineTo(0, this.thrust * 150 * (Math.random() / 2 + 0.5))
       ctx.closePath()
       ctx.fillStyle = "#F08"
       ctx.fill()
     }
+
     // Vykreslení raketky
+    this.drawShield(ctx)
 
     ctx.globalAlpha = 1
-
     ctx.beginPath()
-    ctx.moveTo(0, -12 - this.hit)
-    ctx.lineTo(-6 - this.hit, 6 + this.hit)
-    ctx.lineTo(6 + this.hit, 6 + this.hit)
+    ctx.moveTo(0, -10 - this.hit)
+    ctx.lineTo(-6 - this.hit, 8 + this.hit)
+    ctx.lineTo(6 + this.hit, 8 + this.hit)
     ctx.closePath()
     ctx.fillStyle = isLocalPlayer ? "#fff" : "#d22"
     ctx.fill()
@@ -69,9 +71,9 @@ class ClientPlayer {
     ctx.rotate(this.angle)
     ctx.globalAlpha = 1
     ctx.beginPath()
-    ctx.moveTo(0, -12)
-    ctx.lineTo(-6, 6)
-    ctx.lineTo(6, 6)
+    ctx.moveTo(0, -10)
+    ctx.lineTo(-6, 8)
+    ctx.lineTo(6, 8)
     ctx.closePath()
     ctx.fillStyle = "#888"
     ctx.fill()
@@ -125,6 +127,7 @@ class ClientPlayer {
     ctx.font = "10px Arial"
     ctx.fillText("SP: " + Math.round(this.speed * 1000), -15, 25)
     ctx.fillText("HP: " + Math.round(this.hp), -15, 35)
+    ctx.fillText("SH: " + Math.round(this.shield), -15, 45)
     ctx.fillText(this.name + " " + this.score, -10, -20)
   }
   drawEnemyInfo(ctx) {
@@ -148,6 +151,20 @@ class ClientPlayer {
     ctx.lineTo(-4, -52)
     ctx.closePath()
     ctx.fill()
+  }
+
+  drawShield(ctx) {
+    ctx.globalAlpha = this.shield / 40
+    ctx.beginPath()
+    ctx.moveTo(2, -13)
+    ctx.moveTo(0, -14)
+    ctx.lineTo(-2, -13)
+    ctx.lineTo(-11, 11)
+    ctx.lineTo(11, 11)
+    ctx.closePath()
+    ctx.lineWidth = 2
+    ctx.strokeStyle = "#88f"
+    ctx.stroke()
   }
 
   drawProjectile(ctx) {

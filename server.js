@@ -28,13 +28,7 @@ io.on("connection", (socket) => {
   socket.on("updateControl", (playerData) => {
     const player = game.players[socket.id]
     if (player) {
-      player.name = playerData.name
-      player.updatePosition(playerData.angle, playerData.thrust)
-      player.stayInCanvas(800, 800)
-      player.updateProjectile(playerData.fired)
-      player.stayProjectileInCanvas(800, 800)
-      player.checkPlayerHit(game.players)
-      player.checkProjectileHit(game.players)
+      player.updateControl(playerData)
     }
   })
 
@@ -50,10 +44,11 @@ setInterval(() => {
     gameJson.asteroids[id] = game.asteroids[id].toJSON()
   }
   for (const id in game.players) {
+    game.players[id].update(game)
     gameJson.players[id] = game.players[id].toJSON()
   }
   io.emit("gameState", gameJson)
-}, 1000 / 20)
+}, 1000 / 30)
 
 server.listen(3333, () => {
   console.log("Server running on http://localhost:3333")
