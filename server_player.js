@@ -7,8 +7,9 @@ class ServerPlayer {
     this.shield = 40
     this.x = Math.random() * 600 + 100
     this.y = Math.random() * 400 + 100
+    this.dx = 0
+    this.dy = 0
     this.angle = 0
-    this.move = { x: 0, y: 0 }
     this.thrust = 0
     this.fired = 0
     this.hit = 0
@@ -38,11 +39,11 @@ class ServerPlayer {
 
   updatePosition() {
     if (this.thrust > 0) {
-      this.move.x += (Math.sin(this.angle) * this.thrust) / 500
-      this.move.y -= (Math.cos(this.angle) * this.thrust) / 500
+      this.dx += (Math.sin(this.angle) * this.thrust) / 500
+      this.dy -= (Math.cos(this.angle) * this.thrust) / 500
     }
-    this.x += this.move.x
-    this.y += this.move.y
+    this.x += this.dx
+    this.y += this.dy
   }
 
   stayInCanvas(width, height) {
@@ -68,8 +69,8 @@ class ServerPlayer {
         Math.abs(projectile.y - this.y) < 20
       ) {
         this.takeDamage(20)
-        this.move.x += projectile.dx / 40
-        this.move.y += projectile.dy / 40
+        this.dx += projectile.dx / 40
+        this.dy += projectile.dy / 40
         game.players[projectile.playerId].score++
         projectile.deactivate()
       }
@@ -85,9 +86,12 @@ class ServerPlayer {
       if (Math.abs(this.x - enemy.x) < 16 && Math.abs(this.y - enemy.y) < 16) {
         this.takeDamage(20)
         enemy.takeDamage(20)
-        const move = this.move
-        this.move = enemy.move
-        enemy.move = move
+        const dx = this.dx
+        const dy = this.dy
+        this.dx = enemy.dx
+        this.dy = enemy.dy
+        enemy.dx = dx
+        enemy.dy = dy
       }
     }
   }
@@ -114,8 +118,9 @@ class ServerPlayer {
       score: this.score,
       x: this.x,
       y: this.y,
+      dx: this.dx,
+      dy: this.dy,
       angle: this.angle,
-      move: this.move,
       thrust: this.thrust,
       fired: this.fired,
       projectile: this.projectile,

@@ -1,12 +1,11 @@
 class ClientAsteroid {
-  constructor(a) {
-    this.update(a)
+  constructor(asteroid) {
+    this.update(asteroid)
   }
-  update(a) {
-    this.x = a.x
-    this.y = a.y
-    this.r = a.r
-    this.move = a.move
+  update(asteroid) {
+    this.x = asteroid.x
+    this.y = asteroid.y
+    this.r = asteroid.r
   }
 
   draw(ctx) {

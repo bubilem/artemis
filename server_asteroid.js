@@ -2,8 +2,9 @@ class ServerAsteroid {
   constructor(x, y, r) {
     this.x = x
     this.y = y
+    this.dx = 0
+    this.dy = 0
     this.r = r
-    this.move = { x: 0, y: 0 }
   }
 
   update(game) {
@@ -13,8 +14,8 @@ class ServerAsteroid {
   }
 
   updatePosition() {
-    this.x += this.move.x
-    this.y += this.move.y
+    this.x += this.dx
+    this.y += this.dy
   }
 
   stayInCanvas(width, height) {
@@ -31,8 +32,8 @@ class ServerAsteroid {
         Math.abs(projectile.x - this.x) < this.r &&
         Math.abs(projectile.y - this.y) < this.r
       ) {
-        this.move.x += projectile.dx / 20
-        this.move.y += projectile.dy / 20
+        this.dx += projectile.dx / 50
+        this.dy += projectile.dy / 50
         projectile.deactivate()
       }
     }
@@ -43,7 +44,6 @@ class ServerAsteroid {
       x: this.x,
       y: this.y,
       r: this.r,
-      move: this.move,
     }
   }
 }

@@ -10,13 +10,12 @@ class ClientPlayer {
     this.shield = player.shield
     this.x = player.x
     this.y = player.y
+    this.dx = player.dx
+    this.dy = player.dy
     this.angle = player.angle
-    this.move = player.move
     this.thrust = player.thrust
     this.fired = player.fired
-    this.speed = Math.sqrt(
-      this.move.x * this.move.x + this.move.y * this.move.y
-    )
+    this.speed = Math.sqrt(this.dx ** 2 + this.dy ** 2)
     this.hit = player.hit
     this.reload = 0
   }
@@ -89,7 +88,7 @@ class ClientPlayer {
   drawCompass(ctx) {
     let alpha = this.angle
     if (this.speed > 0.001) {
-      alpha = Math.atan2(this.move.y, this.move.x) + Math.PI / 2
+      alpha = Math.atan2(this.dy, this.dx) + Math.PI / 2
     }
     ctx.rotate(alpha)
     ctx.lineWidth = 1
