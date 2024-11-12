@@ -1,5 +1,6 @@
 import ClientPlayer from "./client_player.js"
 import ClientAsteroid from "./client_asteroid.js"
+import ClientProjectile from "./client_projectile.js"
 const canvas = document.getElementById("gameCanvas")
 const ctx = canvas.getContext("2d")
 const socket = io()
@@ -25,7 +26,8 @@ function generateRandomName() {
 
 nameInput.value = generateRandomName()
 let players = {}
-let asteroids = {}
+let asteroids = []
+let projectiles = []
 let control = {
   name: nameInput.value,
   thrust: 0,
@@ -63,6 +65,12 @@ socket.on("gameState", (gameState) => {
     }
   }
 
+  //projectiles
+  projectiles = []
+  for (const id in gameState.projectiles) {
+    projectiles[id] = new ClientProjectile(gameState.projectiles[id])
+  }
+
   //players
   const serverPlayers = gameState.players
   for (const id in players) {
@@ -77,7 +85,7 @@ socket.on("gameState", (gameState) => {
       players[id].update(serverPlayers[id])
     }
   }
-  if (players[socket.id]?.projectile?.ttl == 0) {
+  if (players[socket.id]?.reload == 0) {
     fireButton.disabled = false
     fireButton.classList.remove("disabled")
   } else {
@@ -89,8 +97,11 @@ socket.on("gameState", (gameState) => {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height)
-  for (const id in asteroids) {
-    asteroids[id].draw(ctx)
+  for (const asteroid of asteroids) {
+    asteroid.draw(ctx)
+  }
+  for (const projectile of projectiles) {
+    projectile.draw(ctx)
   }
 
   for (const id in players) {
@@ -100,7 +111,6 @@ function draw() {
     } else {
       players[id].drawDeadPlayer(ctx, id == socket.id)
     }
-    players[id].drawProjectile(ctx)
   }
 }
 

@@ -1,24 +1,24 @@
 class ClientPlayer {
-  constructor(p) {
-    this.update(p)
+  constructor(player) {
+    this.update(player)
   }
-  update(p) {
-    this.id = p.id
-    this.name = p.name
-    this.score = p.score
-    this.hp = p.hp
-    this.shield = p.shield
-    this.x = p.x
-    this.y = p.y
-    this.angle = p.angle
-    this.move = p.move
-    this.thrust = p.thrust
-    this.fired = p.fired
-    this.projectile = p.projectile
+  update(player) {
+    this.id = player.id
+    this.name = player.name
+    this.score = player.score
+    this.hp = player.hp
+    this.shield = player.shield
+    this.x = player.x
+    this.y = player.y
+    this.angle = player.angle
+    this.move = player.move
+    this.thrust = player.thrust
+    this.fired = player.fired
     this.speed = Math.sqrt(
       this.move.x * this.move.x + this.move.y * this.move.y
     )
-    this.hit = p.hit
+    this.hit = player.hit
+    this.reload = 0
   }
 
   drawPlayer(ctx, isLocalPlayer) {
@@ -77,9 +77,7 @@ class ClientPlayer {
     ctx.closePath()
     ctx.fillStyle = "#888"
     ctx.fill()
-
     ctx.rotate(-this.angle)
-
     if (isLocalPlayer) {
       this.drawPlayerInfo(ctx)
     } else {
@@ -165,20 +163,6 @@ class ClientPlayer {
     ctx.lineWidth = 2
     ctx.strokeStyle = "#88f"
     ctx.stroke()
-  }
-
-  drawProjectile(ctx) {
-    if (this.projectile.ttl <= 0) {
-      return
-    }
-    ctx.save()
-    ctx.translate(this.projectile.x, this.projectile.y)
-    ctx.globalAlpha = 1
-    ctx.beginPath()
-    ctx.arc(0, 0, 4, 0, Math.PI * 2)
-    ctx.fillStyle = "#f22"
-    ctx.fill()
-    ctx.restore()
   }
 }
 

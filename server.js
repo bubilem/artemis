@@ -2,6 +2,7 @@ import express from "express"
 import { createServer } from "http"
 import { Server } from "socket.io"
 import ServerPlayer from "./server_player.js"
+import ServerProjectile from "./server_projectile.js"
 import ServerAsteroid from "./server_asteroid.js"
 
 const app = express()
@@ -11,15 +12,17 @@ app.use(express.static("public"))
 
 const game = {
   players: {},
-  asteroids: {},
+  projectiles: [],
+  asteroids: [],
 }
-game.asteroids[0] = new ServerAsteroid(60, 60, 20)
-game.asteroids[1] = new ServerAsteroid(740, 740, 40)
-
 const gameJson = {
   players: {},
-  asteroids: {},
+  projectiles: [],
+  asteroids: [],
 }
+
+game.asteroids[0] = new ServerAsteroid(60, 60, 20)
+game.asteroids[1] = new ServerAsteroid(740, 740, 40)
 
 io.on("connection", (socket) => {
   console.log("New player connected:", socket.id)
@@ -40,12 +43,28 @@ io.on("connection", (socket) => {
 })
 
 setInterval(() => {
-  for (const id in game.asteroids) {
-    gameJson.asteroids[id] = game.asteroids[id].toJSON()
-  }
   for (const id in game.players) {
     game.players[id].update(game)
+    if (game.players[id].fired == 1) {
+      game.projectiles.push(new ServerProjectile(game.players[id]))
+      game.players[id].fired = 0
+    }
     gameJson.players[id] = game.players[id].toJSON()
+  }
+
+  gameJson.projectiles = []
+  for (const id in game.projectiles) {
+    game.projectiles[id].update()
+    if (game.projectiles[id].ttl > 0) {
+      gameJson.projectiles.push(game.projectiles[id].toJSON())
+    }
+    if (game.projectiles[id].ttl <= 0) {
+      game.projectiles.splice(id, 1)
+    }
+  }
+  for (const id in game.asteroids) {
+    game.asteroids[id].update(game)
+    gameJson.asteroids[id] = game.asteroids[id].toJSON()
   }
   io.emit("gameState", gameJson)
 }, 1000 / 30)
