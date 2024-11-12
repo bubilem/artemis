@@ -13,9 +13,7 @@ class ServerProjectile {
     this.updatePosition()
     this.stayInCanvas(800, 800)
     this.ttl--
-    if (this.ttl <= 0) {
-      this.deactivate()
-    }
+    if (this.ttl <= 0) this.deactivate()
   }
 
   updatePosition() {

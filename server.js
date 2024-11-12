@@ -21,8 +21,8 @@ const gameJson = {
   asteroids: [],
 }
 
-game.asteroids[0] = new ServerAsteroid(60, 60, 20)
-game.asteroids[1] = new ServerAsteroid(740, 740, 40)
+game.asteroids[0] = new ServerAsteroid(60, 60, 30)
+game.asteroids[1] = new ServerAsteroid(740, 740, 30)
 
 io.on("connection", (socket) => {
   console.log("New player connected:", socket.id)
@@ -45,8 +45,9 @@ io.on("connection", (socket) => {
 setInterval(() => {
   for (const id in game.players) {
     game.players[id].update(game)
-    if (game.players[id].fired == 1) {
+    if (game.players[id].fired == 1 && game.players[id].reload == 0) {
       game.projectiles.push(new ServerProjectile(game.players[id]))
+      game.players[id].reload = 20
       game.players[id].fired = 0
     }
     gameJson.players[id] = game.players[id].toJSON()

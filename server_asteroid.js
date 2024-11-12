@@ -11,6 +11,7 @@ class ServerAsteroid {
     this.updatePosition()
     this.stayInCanvas(800, 800)
     this.checkProjectileHit(game)
+    this.checkAsteroidHit(game)
   }
 
   updatePosition() {
@@ -29,12 +30,32 @@ class ServerAsteroid {
     for (let id in game.projectiles) {
       const projectile = game.projectiles[id]
       if (
-        Math.abs(projectile.x - this.x) < this.r &&
-        Math.abs(projectile.y - this.y) < this.r
+        Math.sqrt((this.x - projectile.x) ** 2 + (this.y - projectile.y) ** 2) <
+        this.r + projectile.r
       ) {
         this.dx += projectile.dx / 50
         this.dy += projectile.dy / 50
         projectile.deactivate()
+      }
+    }
+  }
+
+  checkAsteroidHit(game) {
+    for (let id in game.asteroids) {
+      const asteroid = game.asteroids[id]
+      if (asteroid === this) continue
+      if (
+        Math.sqrt((this.x - asteroid.x) ** 2 + (this.y - asteroid.y) ** 2) <
+        this.r + asteroid.r
+      ) {
+        const dx = this.dx
+        const dy = this.dy
+        this.dx = asteroid.dx / 2
+        this.dy = asteroid.dy / 2
+        asteroid.dx = dx / 2
+        asteroid.dy = dy / 2
+        this.updatePosition()
+        asteroid.updatePosition()
       }
     }
   }

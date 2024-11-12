@@ -12,6 +12,7 @@ class ServerPlayer {
     this.angle = 0
     this.thrust = 0
     this.fired = 0
+    this.reload = 0
     this.hit = 0
   }
 
@@ -20,9 +21,7 @@ class ServerPlayer {
     if (this.hp > 0) {
       this.angle = playerData.angle
       this.thrust = playerData.thrust
-      if (playerData.fired == 1) {
-        this.fired = 1
-      }
+      if (playerData.fired == 1) this.fired = 1
     } else {
       this.thrust = 0
     }
@@ -31,10 +30,12 @@ class ServerPlayer {
   update(game) {
     this.updateShield()
     if (this.hit > 0) this.hit--
+    if (this.reload > 0) this.reload--
     this.updatePosition()
     this.stayInCanvas(800, 800)
     this.checkPlayerHit(game)
     this.checkProjectileHit(game)
+    this.checkAsteroidHit(game)
   }
 
   updatePosition() {
@@ -54,21 +55,19 @@ class ServerPlayer {
   }
 
   updateShield() {
-    this.shield += 0.05
+    if (this.hp > 0) this.shield += 0.05
     if (this.shield > 40) this.shield = 40
   }
 
   checkProjectileHit(game) {
     for (let id in game.projectiles) {
       const projectile = game.projectiles[id]
-      if (projectile.playerId == this.id) {
-        continue
-      }
+      if (projectile.playerId == this.id) continue
       if (
-        Math.abs(projectile.x - this.x) < 20 &&
-        Math.abs(projectile.y - this.y) < 20
+        Math.abs(projectile.x - this.x) < 16 &&
+        Math.abs(projectile.y - this.y) < 16
       ) {
-        this.takeDamage(20)
+        this.takeDamage(15)
         this.dx += projectile.dx / 40
         this.dy += projectile.dy / 40
         game.players[projectile.playerId].score++
@@ -80,32 +79,48 @@ class ServerPlayer {
   checkPlayerHit(game) {
     for (let id in game.players) {
       const enemy = game.players[id]
-      if (enemy.id == this.id || this.hp <= 0 || enemy.hp <= 0) {
-        continue
-      }
+      if (enemy.id == this.id) continue
       if (Math.abs(this.x - enemy.x) < 16 && Math.abs(this.y - enemy.y) < 16) {
-        this.takeDamage(20)
-        enemy.takeDamage(20)
+        if (this.hp > 0) this.takeDamage(30)
+        if (enemy.hp > 0) enemy.takeDamage(30)
         const dx = this.dx
         const dy = this.dy
         this.dx = enemy.dx
         this.dy = enemy.dy
         enemy.dx = dx
         enemy.dy = dy
+        this.updatePosition()
+        enemy.updatePosition()
       }
     }
   }
 
-  takeDamage(damage = 20) {
-    this.hit = damage * 3
+  checkAsteroidHit(game) {
+    for (let id in game.asteroids) {
+      const asteroid = game.asteroids[id]
+      if (
+        Math.abs(this.x - asteroid.x) < asteroid.r + 5 &&
+        Math.abs(this.y - asteroid.y) < asteroid.r + 5
+      ) {
+        this.takeDamage(40)
+        asteroid.dx += this.dx / 10
+        asteroid.dy += this.dy / 10
+        this.dx = -this.dx / 2
+        this.dy = -this.dy / 2
+        this.updatePosition()
+        asteroid.updatePosition()
+      }
+    }
+  }
+
+  takeDamage(damage = 10) {
+    this.hit = damage * 2
     if (this.hp <= 0) return
     this.shield -= damage
     if (this.shield <= 0) {
       this.hp += this.shield
       this.shield = 0
-      if (this.hp <= 0) {
-        this.hp = 0
-      }
+      if (this.hp <= 0) this.hp = 0
     }
   }
 
