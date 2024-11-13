@@ -138,7 +138,7 @@ class ServerPlayer {
       angle: this.angle,
       thrust: this.thrust,
       fired: this.fired,
-      projectile: this.projectile,
+      reload: this.reload,
       hit: this.hit,
     }
   }

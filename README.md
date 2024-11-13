@@ -12,12 +12,19 @@ npm install
 npm run dev
 ```
 
-### Client
+### Player client
 
 1. Run internet browser.
-2. Put localhost IP address 127.0.0.1:3333/player.
+2. Put localhost IP address `localhost:3333/player`.
 3. Play.
 4. Run another browser...
+
+_If you are running server in the LAN, write the real server ip address in the broswer on the other computers._
+
+### Observer client
+
+1. Run internet browser.
+2. Put localhost IP address `localhost:3333/observer`.
 
 ## NPM Quick Manual
 

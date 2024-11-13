@@ -21,24 +21,37 @@ const gameJson = {
   asteroids: [],
 }
 
-game.asteroids[0] = new ServerAsteroid(60, 60, 30)
-game.asteroids[1] = new ServerAsteroid(740, 740, 30)
+game.asteroids.push(new ServerAsteroid(60, 60, 30))
+game.asteroids.push(new ServerAsteroid(60, 740, 30))
+game.asteroids.push(new ServerAsteroid(740, 60, 30))
+game.asteroids.push(new ServerAsteroid(740, 740, 30))
 
 io.on("connection", (socket) => {
-  console.log("New player connected:", socket.id)
-  game.players[socket.id] = new ServerPlayer(socket.id)
+  const referer = socket.handshake.headers.referer
+  if (referer.endsWith("/player/")) {
+    console.log("New player connected:", socket.id)
+    game.players[socket.id] = new ServerPlayer(socket.id)
 
-  socket.on("updateControl", (playerData) => {
-    const player = game.players[socket.id]
-    if (player) {
-      player.updateControl(playerData)
-    }
-  })
+    socket.on("updateControl", (playerData) => {
+      const player = game.players[socket.id]
+      if (player) {
+        player.updateControl(playerData)
+      }
+    })
+  }
+  if (referer.endsWith("/observer/")) {
+    console.log("New observer connected:", socket.id)
+  }
 
   socket.on("disconnect", () => {
-    console.log("Player disconnected:", socket.id)
-    delete game.players[socket.id]
-    delete gameJson.players[socket.id]
+    if (referer.endsWith("/player/")) {
+      console.log("Player disconnected:", socket.id)
+      delete game.players[socket.id]
+      delete gameJson.players[socket.id]
+    }
+    if (referer.endsWith("/observer/")) {
+      console.log("Observer disconnected:", socket.id)
+    }
   })
 })
 

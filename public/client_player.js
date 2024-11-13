@@ -17,7 +17,7 @@ class ClientPlayer {
     this.fired = player.fired
     this.speed = Math.sqrt(this.dx ** 2 + this.dy ** 2)
     this.hit = player.hit
-    this.reload = 0
+    this.reload = player.reload
   }
 
   drawPlayer(ctx, isLocalPlayer) {
@@ -28,54 +28,47 @@ class ClientPlayer {
     }
     ctx.rotate(this.angle)
     if (isLocalPlayer) {
-      this.drawdirectionArrow(ctx)
+      this.drawDirectionArrow(ctx)
     }
-    // Vykreslení plamene
-    if (this.thrust > 0) {
-      ctx.beginPath()
-      ctx.moveTo(-4, 7)
-      ctx.lineTo(4, 7)
-      ctx.lineTo(0, this.thrust * 150 * (Math.random() / 2 + 0.5))
-      ctx.closePath()
-      ctx.fillStyle = "#F08"
-      ctx.fill()
-    }
-
-    // Vykreslení raketky
+    if (this.thrust > 0) this.drawEngineTrail(ctx, this.thrust)
     this.drawShield(ctx)
-
-    ctx.globalAlpha = 1
-    ctx.beginPath()
-    ctx.moveTo(0, -10 - this.hit)
-    ctx.lineTo(-6 - this.hit, 8 + this.hit)
-    ctx.lineTo(6 + this.hit, 8 + this.hit)
-    ctx.closePath()
-    ctx.fillStyle = isLocalPlayer ? "#fff" : "#d22"
-    ctx.fill()
-
+    this.drawShip(ctx, isLocalPlayer ? "#fff" : "#d22", this.hit)
     ctx.rotate(-this.angle)
-
     if (isLocalPlayer) {
       this.drawPlayerInfo(ctx)
     } else {
       this.drawEnemyInfo(ctx)
     }
-
     ctx.restore()
+  }
+
+  drawShip(ctx, color, hit) {
+    ctx.globalAlpha = 1
+    ctx.fillStyle = color
+    ctx.beginPath()
+    ctx.moveTo(0, -10 - hit)
+    ctx.lineTo(-6 - hit, 8 + hit)
+    ctx.lineTo(6 + hit, 8 + hit)
+    ctx.closePath()
+    ctx.fill()
+  }
+
+  drawEngineTrail(ctx, thrust) {
+    ctx.globalAlpha = 0.9
+    ctx.fillStyle = "#F08"
+    ctx.beginPath()
+    ctx.moveTo(-4, 7)
+    ctx.lineTo(4, 7)
+    ctx.lineTo(0, thrust * 150 * (Math.random() / 2 + 0.5))
+    ctx.closePath()
+    ctx.fill()
   }
 
   drawDeadPlayer(ctx, isLocalPlayer) {
     ctx.save()
     ctx.translate(this.x, this.y)
     ctx.rotate(this.angle)
-    ctx.globalAlpha = 1
-    ctx.beginPath()
-    ctx.moveTo(0, -10)
-    ctx.lineTo(-6, 8)
-    ctx.lineTo(6, 8)
-    ctx.closePath()
-    ctx.fillStyle = "#888"
-    ctx.fill()
+    this.drawShip(ctx, "#888", 0)
     ctx.rotate(-this.angle)
     if (isLocalPlayer) {
       this.drawPlayerInfo(ctx)
@@ -129,15 +122,15 @@ class ClientPlayer {
   }
   drawEnemyInfo(ctx) {
     ctx.globalAlpha = 0.8
-    ctx.fillStyle = "#9aa"
+    ctx.fillStyle = "#aaa"
     ctx.font = "10px Arial"
     ctx.fillText(this.name, -7, -20)
   }
 
-  drawdirectionArrow(ctx) {
+  drawDirectionArrow(ctx) {
+    ctx.globalAlpha = 0.5
     ctx.strokeStyle = "#a00"
     ctx.fillStyle = "#a00"
-    ctx.globalAlpha = 0.5
     ctx.beginPath()
     ctx.moveTo(0, 0)
     ctx.lineTo(0, -50)
@@ -152,6 +145,8 @@ class ClientPlayer {
 
   drawShield(ctx) {
     ctx.globalAlpha = this.shield / 40
+    ctx.lineWidth = 2
+    ctx.strokeStyle = "#88f"
     ctx.beginPath()
     ctx.moveTo(2, -13)
     ctx.moveTo(0, -14)
@@ -159,8 +154,6 @@ class ClientPlayer {
     ctx.lineTo(-11, 11)
     ctx.lineTo(11, 11)
     ctx.closePath()
-    ctx.lineWidth = 2
-    ctx.strokeStyle = "#88f"
     ctx.stroke()
   }
 }

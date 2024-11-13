@@ -8,52 +8,10 @@ const socket = io()
 const bgImage = new Image()
 bgImage.src = "../bg.webp"
 
-const nameInput = document.getElementById("nameInput")
-const thrustSlider = document.getElementById("thrustSlider")
-const angleSlider = document.getElementById("angleSlider")
-const fireButton = document.getElementById("fireButton")
-
-// Function to generate a random two-letter player name
-function generateRandomName() {
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  let name = ""
-  for (let i = 0; i < 2; i++) {
-    const randomIndex = Math.floor(Math.random() * alphabet.length)
-    name += alphabet.charAt(randomIndex)
-  }
-  return name
-}
-
-nameInput.value = generateRandomName()
 let players = {}
 let asteroids = []
 let projectiles = []
-let control = {
-  name: nameInput.value,
-  thrust: 0,
-  angle: 0,
-  fired: 0,
-}
 
-nameInput.oninput = (e) => {
-  control.name = e.target.value
-}
-thrustSlider.oninput = (e) => {
-  control.thrust = parseFloat(e.target.value)
-}
-angleSlider.oninput = (e) => {
-  control.angle = parseFloat(e.target.value)
-}
-fireButton.onclick = (e) => {
-  control.fired = 1
-}
-
-// Aktualizace hráče na server
-function updateControl() {
-  socket.emit("updateControl", control)
-}
-
-// Zpracování příchozího stavu hry
 socket.on("gameState", (gameState) => {
   //asteroids
   const serverAsteroids = gameState.asteroids
@@ -64,13 +22,11 @@ socket.on("gameState", (gameState) => {
       asteroids[id].update(serverAsteroids[id])
     }
   }
-
   //projectiles
   projectiles = []
   for (const id in gameState.projectiles) {
     projectiles[id] = new ClientProjectile(gameState.projectiles[id])
   }
-
   //players
   const serverPlayers = gameState.players
   for (const id in players) {
@@ -103,22 +59,18 @@ function draw() {
   for (const projectile of projectiles) {
     projectile.draw(ctx)
   }
-
   for (const id in players) {
     if (!players[id]) continue
     if (players[id].hp > 0) {
-      players[id].drawPlayer(ctx, id == socket.id)
+      players[id].drawPlayer(ctx, true)
     } else {
-      players[id].drawDeadPlayer(ctx, id == socket.id)
+      players[id].drawDeadPlayer(ctx, true)
     }
   }
 }
 
 function gameLoop() {
-  updateControl()
   draw()
   requestAnimationFrame(gameLoop)
-  control.fired = 0
 }
-
 gameLoop()
