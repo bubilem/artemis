@@ -28,14 +28,17 @@ game.asteroids.push(new ServerAsteroid(740, 740, 30))
 
 io.on("connection", (socket) => {
   const referer = socket.handshake.headers.referer
-  if (referer.endsWith("/player/")) {
-    console.log("New player connected:", socket.id)
-    game.players[socket.id] = new ServerPlayer(socket.id)
+  if (referer.includes("/player/game.html?name=")) {
+    const query = new URLSearchParams(referer.split("?")[1])
+    const name = query.get("name") || ""
+    console.log(`New player connected: ${name} (${socket.id})`)
+    game.players[socket.id] = new ServerPlayer(socket.id, name)
+    socket.handshake.query.name
 
-    socket.on("updateControl", (playerData) => {
+    socket.on("updateControl", (playerControl) => {
       const player = game.players[socket.id]
       if (player) {
-        player.updateControl(playerData)
+        player.updateControl(playerControl)
       }
     })
   }
@@ -44,8 +47,10 @@ io.on("connection", (socket) => {
   }
 
   socket.on("disconnect", () => {
-    if (referer.endsWith("/player/")) {
-      console.log("Player disconnected:", socket.id)
+    if (referer.includes("/player/game.html")) {
+      console.log(
+        `Player disconnected: ${game.players[socket.id].name} (${socket.id})`
+      )
       delete game.players[socket.id]
       delete gameJson.players[socket.id]
     }

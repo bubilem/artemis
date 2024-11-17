@@ -1,7 +1,7 @@
 class ServerPlayer {
-  constructor(id) {
+  constructor(id, name) {
     this.id = id
-    this.name = ""
+    this.name = name
     this.score = 0
     this.hp = 100
     this.shield = 40
@@ -11,19 +11,32 @@ class ServerPlayer {
     this.dy = 0
     this.angle = 0
     this.thrust = 0
+    this.thrust_rotate = 0
     this.fired = 0
     this.reload = 0
     this.hit = 0
   }
 
-  updateControl(playerData) {
-    this.name = playerData.name
+  updateControl(playerControl) {
     if (this.hp > 0) {
-      this.angle = playerData.angle
-      this.thrust = playerData.thrust
-      if (playerData.fired == 1) this.fired = 1
+      if (playerControl.thrust != undefined && playerControl.thrust != 0) {
+        this.thrust += playerControl.thrust > 0 ? 0.01 : -0.01
+        if (this.thrust > 1) this.thrust = 1
+        if (this.thrust < 0) this.thrust = 0
+      }
+      if (
+        playerControl.thrust_rotate != undefined &&
+        playerControl.thrust_rotate != 0
+      ) {
+        this.thrust_rotate += playerControl.thrust_rotate > 0 ? 0.001 : -0.001
+        if (this.thrust_rotate > 0.1) this.thrust_rotate = 0.1
+        if (this.thrust_rotate < -0.1) this.thrust_rotate = -0.1
+      }
+
+      if (playerControl.fired == 1) this.fired = 1
     } else {
       this.thrust = 0
+      this.thrust_rotate = 0
     }
   }
 
@@ -45,6 +58,8 @@ class ServerPlayer {
     }
     this.x += this.dx
     this.y += this.dy
+    this.angle += this.thrust_rotate
+    //this.angle %= Math.PI * 2
   }
 
   stayInCanvas(width, height) {
@@ -137,6 +152,7 @@ class ServerPlayer {
       dy: this.dy,
       angle: this.angle,
       thrust: this.thrust,
+      thrust_rotate: this.thrust_rotate,
       fired: this.fired,
       reload: this.reload,
       hit: this.hit,

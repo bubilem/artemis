@@ -14,6 +14,7 @@ class ClientPlayer {
     this.dy = player.dy
     this.angle = player.angle
     this.thrust = player.thrust
+    this.thrust_rotate = player.thrust_rotate
     this.fired = player.fired
     this.speed = Math.sqrt(this.dx ** 2 + this.dy ** 2)
     this.hit = player.hit
@@ -89,42 +90,26 @@ class ClientPlayer {
     ctx.strokeStyle = "#666"
     ctx.fillStyle = "#aaa"
     ctx.beginPath()
-    ctx.arc(0, 0, 30, 0, Math.PI * 2)
+    ctx.arc(0, 0, 40, 0, Math.PI * 2)
     ctx.stroke()
     ctx.beginPath()
-    ctx.arc(0, 0, 50, 0, Math.PI * 2)
+    ctx.arc(0, 0, 60, 0, Math.PI * 2)
     ctx.stroke()
     ctx.beginPath()
-    ctx.moveTo(0, 50)
-    ctx.lineTo(0, -50)
+    ctx.moveTo(0, 60)
+    ctx.lineTo(0, -60)
     ctx.stroke()
     ctx.beginPath()
-    ctx.moveTo(50, 0)
-    ctx.lineTo(-50, 0)
+    ctx.moveTo(60, 0)
+    ctx.lineTo(-60, 0)
     ctx.stroke()
     ctx.beginPath()
-    ctx.moveTo(0, -50)
-    ctx.lineTo(4, -43)
-    ctx.lineTo(-4, -43)
+    ctx.moveTo(0, -60)
+    ctx.lineTo(4, -53)
+    ctx.lineTo(-4, -53)
     ctx.closePath()
     ctx.fill()
     ctx.rotate(-alpha)
-  }
-
-  drawPlayerInfo(ctx) {
-    ctx.globalAlpha = 0.8
-    ctx.fillStyle = "#aaa"
-    ctx.font = "10px Arial"
-    ctx.fillText("SP: " + Math.round(this.speed * 1000), -15, 25)
-    ctx.fillText("HP: " + Math.round(this.hp), -15, 35)
-    ctx.fillText("SH: " + Math.round(this.shield), -15, 45)
-    ctx.fillText(this.name + " " + this.score, -10, -20)
-  }
-  drawEnemyInfo(ctx) {
-    ctx.globalAlpha = 0.8
-    ctx.fillStyle = "#aaa"
-    ctx.font = "10px Arial"
-    ctx.fillText(this.name, -7, -20)
   }
 
   drawDirectionArrow(ctx) {
@@ -133,24 +118,48 @@ class ClientPlayer {
     ctx.fillStyle = "#a00"
     ctx.beginPath()
     ctx.moveTo(0, 0)
-    ctx.lineTo(0, -50)
+    ctx.lineTo(0, -60)
     ctx.stroke()
     ctx.beginPath()
-    ctx.moveTo(0, -59)
-    ctx.lineTo(4, -52)
-    ctx.lineTo(-4, -52)
+    ctx.moveTo(0, -69)
+    ctx.lineTo(4, -62)
+    ctx.lineTo(-4, -62)
     ctx.closePath()
     ctx.fill()
   }
 
+  drawPlayerInfo(ctx) {
+    ctx.globalAlpha = 0.8
+    ctx.fillStyle = "#aaa"
+    ctx.font = "10px Arial"
+    ctx.fillText(this.name + " " + this.score, -10, -20)
+    let th = Math.round(this.thrust * 100)
+    let rtdir = ""
+    if (this.thrust_rotate != 0) {
+      rtdir = this.thrust_rotate > 0 ? "R" : "L"
+    }
+    let rt = Math.abs(Math.round(this.thrust_rotate * 1000))
+    ctx.fillText(`SP: ${Math.round(this.speed * 1000)}`, -20, 25)
+    ctx.fillText(`TH: ${th}+${rtdir}${rt}`, -20, 35)
+    let hp = Math.round(this.hp)
+    let sh = Math.round(this.shield)
+    ctx.fillText(`HP: ${hp}+${sh}`, -20, 45)
+  }
+  drawEnemyInfo(ctx) {
+    ctx.globalAlpha = 0.8
+    ctx.fillStyle = "#aaa"
+    ctx.font = "10px Arial"
+    ctx.fillText(this.name, -7, -20)
+  }
+
   drawShield(ctx) {
     ctx.globalAlpha = this.shield / 40
-    ctx.lineWidth = 2
+    ctx.lineWidth = 3
     ctx.strokeStyle = "#88f"
     ctx.beginPath()
-    ctx.moveTo(2, -13)
-    ctx.moveTo(0, -14)
-    ctx.lineTo(-2, -13)
+    ctx.moveTo(3, -13)
+    ctx.lineTo(0, -15)
+    ctx.lineTo(-3, -13)
     ctx.lineTo(-11, 11)
     ctx.lineTo(11, 11)
     ctx.closePath()

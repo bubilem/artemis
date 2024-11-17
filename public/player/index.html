@@ -7,42 +7,40 @@
     <link rel="stylesheet" href="../style.css" />
   </head>
   <body>
+    <header>
+      <h1>ARTEMIS <small>ARENA</small></h1>
+    </header>
     <main>
-      <canvas id="gameCanvas" width="800" height="800"></canvas>
-      <div class="controls">
-        <div class="control-group">
-          <label for="nameInput">Name</label>
-          <input type="text" id="nameInput" maxlength="2" size="2" value="" />
-        </div>
-        <div class="control-group">
-          <label for="thrustSlider">Thrust</label>
-          <input
-            type="range"
-            id="thrustSlider"
-            min="0"
-            max="1"
-            step="0.01"
-            value="0"
-          />
-        </div>
-        <div class="control-group">
-          <label for="angleSlider">Angle</label>
-          <input
-            type="range"
-            id="angleSlider"
-            min="-3.1415"
-            max="3.1415"
-            step="0.0001"
-            value="0"
-          />
-        </div>
-        <div class="control-group">
-          <button id="fireButton">Fire</button>
-        </div>
-      </div>
+      <form action="game.html" method="get">
+        <label for="name">Player name</label>
+        <input
+          type="text"
+          name="name"
+          id="name"
+          maxlength="2"
+          size="2"
+          value=""
+        />
+        <button id="fireButton">Play</button>
+      </form>
     </main>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="module" src="client.js"></script>
+    <footer>
+      <p>
+        Auth: <a href="https://www.skolavdf.cz">ŠkolaVDF</a>, Repo:
+        <a href="https://github.com/bubilem/artemis">bubilem/artemis</a>
+      </p>
+    </footer>
+    <script>
+      document.getElementById("name").value = generateRandomName()
+      function generateRandomName() {
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        let name = ""
+        for (let i = 0; i < 2; i++) {
+          const randomIndex = Math.floor(Math.random() * alphabet.length)
+          name += alphabet.charAt(randomIndex)
+        }
+        return name
+      }
+    </script>
   </body>
 </html>

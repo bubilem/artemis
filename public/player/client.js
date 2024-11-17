@@ -8,44 +8,36 @@ const socket = io()
 const bgImage = new Image()
 bgImage.src = "../bg.webp"
 
-const nameInput = document.getElementById("nameInput")
-const thrustSlider = document.getElementById("thrustSlider")
-const angleSlider = document.getElementById("angleSlider")
-const fireButton = document.getElementById("fireButton")
-
-// Function to generate a random two-letter player name
-function generateRandomName() {
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  let name = ""
-  for (let i = 0; i < 2; i++) {
-    const randomIndex = Math.floor(Math.random() * alphabet.length)
-    name += alphabet.charAt(randomIndex)
-  }
-  return name
-}
-
-nameInput.value = generateRandomName()
 let players = {}
 let asteroids = []
 let projectiles = []
 let control = {
-  name: nameInput.value,
   thrust: 0,
+  thrust_rotate: 0,
   angle: 0,
   fired: 0,
 }
 
-nameInput.oninput = (e) => {
-  control.name = e.target.value
-}
-thrustSlider.oninput = (e) => {
-  control.thrust = parseFloat(e.target.value)
-}
-angleSlider.oninput = (e) => {
-  control.angle = parseFloat(e.target.value)
-}
-fireButton.onclick = (e) => {
-  control.fired = 1
+document.onkeydown = (e) => {
+  switch (e.key) {
+    case "w":
+      control.thrust = 1
+      break
+    case "s":
+      control.thrust = -1
+      break
+    case "q":
+    case "a":
+      control.thrust_rotate = -1
+      break
+    case "e":
+    case "d":
+      control.thrust_rotate = 1
+      break
+    case " ":
+      control.fired = 1
+      break
+  }
 }
 
 // Aktualizace hráče na server
@@ -85,13 +77,6 @@ socket.on("gameState", (gameState) => {
       players[id].update(serverPlayers[id])
     }
   }
-  if (players[socket.id]?.reload == 0) {
-    fireButton.disabled = false
-    fireButton.classList.remove("disabled")
-  } else {
-    fireButton.disabled = true
-    fireButton.classList.add("disabled")
-  }
 })
 
 function draw() {
@@ -119,6 +104,8 @@ function gameLoop() {
   draw()
   requestAnimationFrame(gameLoop)
   control.fired = 0
+  control.thrust = 0
+  control.thrust_rotate = 0
 }
 
 gameLoop()

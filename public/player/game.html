@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Player : Artemis</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>ARTEMIS <small>ARENA</small></h1>
+    </header>
+    <main>
+      <canvas id="gameCanvas" width="800" height="800"></canvas>
+      <p class="legend">
+        Thrust: <b>WSAD</b> or <b>WSQE</b>, Fire: <b>SPACE</b>
+      </p>
+    </main>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="client.js"></script>
+  </body>
+</html>
