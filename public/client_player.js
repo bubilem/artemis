@@ -56,7 +56,7 @@ class ClientPlayer {
 
   drawEngineTrail(ctx, thrust) {
     ctx.globalAlpha = 0.9
-    ctx.fillStyle = "#F08"
+    ctx.fillStyle = "#d0a"
     ctx.beginPath()
     ctx.moveTo(-4, 7)
     ctx.lineTo(4, 7)
@@ -155,7 +155,7 @@ class ClientPlayer {
   drawShield(ctx) {
     ctx.globalAlpha = this.shield / 40
     ctx.lineWidth = 3
-    ctx.strokeStyle = "#88f"
+    ctx.strokeStyle = "#939"
     ctx.beginPath()
     ctx.moveTo(3, -13)
     ctx.lineTo(0, -15)
